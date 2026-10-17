@@ -285,7 +285,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
               hoverEffect="border-glow"
               hoverAccentColor="#0a66c2"
               as="a"
-              href="http://linkedin.com/in/dibash-lamichhane-47871b434"
+              href="https://www.linkedin.com/in/dibash-lamichhane-47871b434"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Dibash Lamichhane LinkedIn Profile"

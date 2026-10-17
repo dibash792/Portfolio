@@ -373,7 +373,7 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
 
                 <Magnetic strength={0.3}>
                   <a
-                    href="http://linkedin.com/in/dibash-lamichhane-47871b434"
+                    href="https://www.linkedin.com/in/dibash-lamichhane-47871b434"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Dibash Lamichhane LinkedIn Profile"

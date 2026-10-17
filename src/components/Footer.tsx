@@ -96,7 +96,7 @@ export const Footer: React.FC<FooterProps> = ({ language }) => {
                 </a>
 
                 <a
-                  href="http://linkedin.com/in/dibash-lamichhane-47871b434"
+                  href="https://www.linkedin.com/in/dibash-lamichhane-47871b434"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="LinkedIn Profile"
