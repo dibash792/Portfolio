@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import type { Language, Theme } from './types';
 import { CinematicIntro } from './components/CinematicIntro';
 import { Navigation } from './components/Navigation';
+import { AmbientPortfolioBackground } from './components/AmbientPortfolioBackground';
+import { CustomCursor } from './components/motion/CustomCursor';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
 import { Projects } from './components/Projects';
@@ -21,7 +23,9 @@ export function App() {
   });
 
   const [theme, setTheme] = useState<Theme>(() => {
-    return (localStorage.getItem('dibash_theme') as Theme) || 'dark';
+    const saved = localStorage.getItem('dibash_theme');
+    if (saved === 'warm-violet' || saved === 'light') return 'warm-violet';
+    return 'cool-blue';
   });
 
   // Controls the 4-phase cinematic portrait disintegration into hero transition
@@ -59,6 +63,9 @@ export function App() {
 
   return (
     <div className="portfolio-app-root" style={{ position: 'relative', minHeight: '100vh' }}>
+      {/* Premium Interactive Cybernetic Custom Cursor */}
+      <CustomCursor theme={theme} />
+
       {/* 3D Cinematic Portrait Disintegration Intro */}
       {introPhase !== 'revealed' && (
         <CinematicIntro
@@ -76,6 +83,9 @@ export function App() {
         onThemeChange={handleThemeChange}
         onReplayIntro={handleReplayIntro}
       />
+
+      {/* Persistent 3D Floating-Cube & Constellation Background Across Portfolio */}
+      <AmbientPortfolioBackground theme={theme} />
 
       {/* Main Experience Flow */}
       <main style={{ position: 'relative', zIndex: 1 }}>

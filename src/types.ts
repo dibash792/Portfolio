@@ -1,5 +1,6 @@
 export type Language = 'en' | 'np';
-export type Theme = 'dark' | 'light';
+export type Theme = 'cool-blue' | 'warm-violet' | 'dark' | 'light';
+
 
 export interface ProjectItem {
   id: string;

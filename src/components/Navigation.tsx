@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, Moon, Globe, Sparkles, Menu, X, ArrowUpRight } from 'lucide-react';
+import { Globe, Sparkles, Menu, X, ArrowUpRight } from 'lucide-react';
 import type { Language, Theme } from '../types';
 import { translations } from '../i18n/translations';
 
@@ -22,6 +22,7 @@ export const Navigation: React.FC<NavigationProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('hero');
   const t = translations[language].nav;
+  const isViolet = theme === 'warm-violet' || theme === 'light';
 
   useEffect(() => {
     const sections = ['hero', 'about', 'projects', 'skills', 'journey', 'yoga', 'speaking', 'contact'];
@@ -63,18 +64,14 @@ export const Navigation: React.FC<NavigationProps> = ({
         right: 0,
         zIndex: 1000,
         padding: scrolled ? '0.75rem 0' : '1.25rem 0',
-        transition: 'padding 0.3s ease, background 0.3s ease, border-color 0.3s ease',
+        transition: 'padding 0.3s ease, background 0.4s ease, border-color 0.4s ease',
         background: scrolled
-          ? theme === 'dark'
-            ? 'rgba(6, 8, 13, 0.85)'
-            : 'rgba(248, 250, 252, 0.85)'
+          ? 'var(--bg-card)'
           : 'transparent',
         backdropFilter: scrolled ? 'blur(16px)' : 'none',
         WebkitBackdropFilter: scrolled ? 'blur(16px)' : 'none',
         borderBottom: scrolled
-          ? theme === 'dark'
-            ? '1px solid rgba(255, 255, 255, 0.08)'
-            : '1px solid rgba(15, 23, 42, 0.08)'
+          ? '1px solid var(--border-subtle)'
           : '1px solid transparent',
       }}
     >
@@ -240,27 +237,62 @@ export const Navigation: React.FC<NavigationProps> = ({
             <span>{language === 'en' ? 'नेपाली' : 'EN'}</span>
           </button>
 
-          {/* Theme Switcher */}
+          {/* Color-Atmosphere Switcher */}
           <button
-            onClick={() => onThemeChange(theme === 'dark' ? 'light' : 'dark')}
-            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            onClick={() => onThemeChange(isViolet ? 'cool-blue' : 'warm-violet')}
+            title={isViolet ? 'Atmosphere: Warm Violet (Click for Cool Blue)' : 'Atmosphere: Cool Blue (Click for Warm Violet)'}
+            aria-label={isViolet ? 'Atmosphere: Warm Violet (Click for Cool Blue)' : 'Atmosphere: Cool Blue (Click for Warm Violet)'}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '36px',
-              height: '36px',
+              width: '38px',
+              height: '38px',
               background: 'var(--bg-card)',
               border: '1px solid var(--border-subtle)',
               borderRadius: '50%',
-              color: 'var(--text-primary)',
+              color: 'var(--accent-cyan)',
               cursor: 'pointer',
-              transition: 'all 0.2s ease',
+              transition: 'all 0.25s ease',
+              position: 'relative',
+              overflow: 'hidden',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent-cyan)')}
-            onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border-subtle)')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent-cyan)';
+              e.currentTarget.style.boxShadow = '0 0 14px var(--accent-cyan-glow)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-subtle)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
-            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            {isViolet ? (
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '18px',
+                  height: '18px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #c084fc, #e879f9)',
+                  boxShadow: '0 0 10px rgba(192, 132, 252, 0.7)',
+                }}
+              />
+            ) : (
+              <span
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '18px',
+                  height: '18px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #00f2fe, #3b82f6)',
+                  boxShadow: '0 0 10px rgba(0, 242, 254, 0.7)',
+                }}
+              />
+            )}
           </button>
 
           {/* Mobile Menu Toggle */}
@@ -293,7 +325,7 @@ export const Navigation: React.FC<NavigationProps> = ({
             left: 0,
             right: 0,
             bottom: 0,
-            background: theme === 'dark' ? 'rgba(6, 8, 13, 0.96)' : 'rgba(248, 250, 252, 0.96)',
+            background: 'var(--hero-surface)',
             backdropFilter: 'blur(20px)',
             display: 'flex',
             flexDirection: 'column',

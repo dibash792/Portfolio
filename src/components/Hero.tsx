@@ -1,5 +1,6 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
-import { ArrowDown, Sparkles, BookOpen, Compass } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { ArrowDown, Compass } from 'lucide-react';
+import { motion, type Variants } from 'motion/react';
 import { GithubIcon, LinkedinIcon } from './Icons';
 import type { Language, Theme } from '../types';
 import type { IntroPhase } from '../App';
@@ -7,6 +8,7 @@ import { translations } from '../i18n/translations';
 import { Magnetic } from './motion/Magnetic';
 import { ScrollHighlightText } from './motion/ScrollHighlightText';
 import { HeroInteractiveBlocks } from './HeroInteractiveBlocks';
+import { InteractiveIDCard } from './InteractiveIDCard';
 
 interface HeroProps {
   language: Language;
@@ -14,71 +16,130 @@ interface HeroProps {
   introPhase?: IntroPhase;
 }
 
+const heroContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+  },
+};
+
+const badgeVariants: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      delay: 0.1,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
+const nameVariants: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      delay: 0.25,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
+const headlineContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 0.48,
+      staggerChildren: 0.055,
+    },
+  },
+};
+
+const headlineWordVariants: Variants = {
+  hidden: { opacity: 0, y: '115%' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
+const subheadlineVariants: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.65,
+      delay: 1.05,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
+const actionsContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 1.35,
+      staggerChildren: 0.14,
+    },
+  },
+};
+
+const actionButtonVariants: Variants = {
+  hidden: { opacity: 0, y: 16, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.48,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
+const socialContainerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      delayChildren: 1.85,
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const socialItemVariants: Variants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.45,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
 export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase = 'revealed' }) => {
   const t = translations[language].hero;
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const [tilt, setTilt] = useState({ rx: 0, ry: 0, glowX: 50, glowY: 50 });
-  const [revealedStep, setRevealedStep] = useState(() => (introPhase === 'revealed' ? 7 : 0));
+  const isViolet = theme === 'warm-violet' || theme === 'light';
+  // Text reveal activates strictly AFTER photo assembly settles into the hero layout
+  const isTextActive = introPhase === 'revealed';
+  // Card and backdrop interactive geometry mounts/activates during transition
+  const isCardActive = introPhase !== 'intro';
 
-  // Sequence timing triggers when introPhase transitions to 'transitioning' or 'revealed'
-  useEffect(() => {
-    if (introPhase === 'revealed') {
-      setRevealedStep(7);
-      return;
-    }
-
-    if (introPhase === 'transitioning') {
-      // Staged reveal sequence over ~2.1 seconds
-      const timers: ReturnType<typeof setTimeout>[] = [];
-      const steps = [
-        { step: 1, delay: 100 },  // Status badge & personal identifier
-        { step: 2, delay: 280 },  // Greeting & Name
-        { step: 3, delay: 550 },  // Headline word-by-word
-        { step: 4, delay: 1100 }, // Supporting text
-        { step: 5, delay: 1400 }, // Action links (CTAs)
-        { step: 6, delay: 1750 }, // Floating 3D HUD badges & verified links
-        { step: 7, delay: 2100 }, // Scroll cue
-      ];
-
-      steps.forEach(({ step, delay }) => {
-        const timer = setTimeout(() => {
-          setRevealedStep((prev) => Math.max(prev, step));
-        }, delay);
-        timers.push(timer);
-      });
-
-      return () => {
-        timers.forEach((t) => clearTimeout(t));
-      };
-    }
-
-    if (introPhase === 'intro') {
-      setRevealedStep(0);
-    }
-  }, [introPhase]);
-
-  // 3D Pointer tilt interaction for the portrait
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-
-    const rx = ((y - centerY) / centerY) * -10;
-    const ry = ((x - centerX) / centerX) * 10;
-    const glowX = (x / rect.width) * 100;
-    const glowY = (y / rect.height) * 100;
-
-    setTilt({ rx, ry, glowX, glowY });
-  };
-
-  const handleMouseLeave = () => {
-    setTilt({ rx: 0, ry: 0, glowX: 50, glowY: 50 });
-  };
-
-  const isStepActive = (step: number) => revealedStep >= step;
 
   // Split main headline into words for staged masked reveal
   const headlineWords = useMemo(() => {
@@ -101,7 +162,7 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
       className="perspective-container"
     >
       {/* Signature 3D Interactive Blue-Block Background — Primary Opening Showcase */}
-      <HeroInteractiveBlocks theme={theme} isRevealed={introPhase !== 'intro'} />
+      <HeroInteractiveBlocks theme={theme} isRevealed={isCardActive} />
 
       {/* Atmospheric Contrast Vignette for Perfect Text Contrast & Readability */}
       <div
@@ -109,11 +170,12 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
           position: 'absolute',
           inset: 0,
           background:
-            theme === 'dark'
-              ? 'radial-gradient(ellipse at 28% 50%, rgba(5, 7, 12, 0.88) 0%, rgba(5, 7, 12, 0.55) 55%, rgba(5, 7, 12, 0.22) 100%)'
-              : 'radial-gradient(ellipse at 28% 50%, rgba(248, 250, 252, 0.90) 0%, rgba(248, 250, 252, 0.6) 55%, rgba(248, 250, 252, 0.25) 100%)',
+            isViolet
+              ? 'radial-gradient(ellipse at 28% 50%, rgba(13, 8, 23, 0.90) 0%, rgba(13, 8, 23, 0.58) 55%, rgba(13, 8, 23, 0.22) 100%)'
+              : 'radial-gradient(ellipse at 28% 50%, rgba(4, 7, 17, 0.90) 0%, rgba(4, 7, 17, 0.58) 55%, rgba(4, 7, 17, 0.22) 100%)',
           pointerEvents: 'none',
           zIndex: 1,
+          transition: 'background 0.6s ease',
         }}
       />
 
@@ -126,11 +188,13 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
           transform: 'translate(-50%, -50%)',
           width: 'min(1100px, 95vw)',
           height: '600px',
-          background: 'radial-gradient(circle, rgba(0, 242, 254, 0.12) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 75%)',
+          background: isViolet
+            ? 'radial-gradient(circle, rgba(192, 132, 252, 0.15) 0%, rgba(124, 58, 237, 0.05) 50%, transparent 75%)'
+            : 'radial-gradient(circle, rgba(0, 242, 254, 0.15) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 75%)',
           filter: 'blur(90px)',
           pointerEvents: 'none',
           opacity: introPhase === 'intro' ? 0.3 : 0.85,
-          transition: 'opacity 1.2s ease',
+          transition: 'opacity 1.2s ease, background 0.6s ease',
           zIndex: 1,
         }}
       />
@@ -144,10 +208,15 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
             gap: '3.5rem',
           }}
         >
-          {/* Left Column: Typography & Intent */}
-          <div>
+          {/* Left Column: Typography & Intent with Motion Orchestration */}
+          <motion.div
+            variants={heroContainerVariants}
+            initial="hidden"
+            animate={isTextActive ? 'visible' : 'hidden'}
+          >
             {/* Status Pill (Step 1) */}
-            <div
+            <motion.div
+              variants={badgeVariants}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -162,9 +231,6 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
                 fontWeight: 600,
                 letterSpacing: '0.08em',
                 marginBottom: '1.5rem',
-                transform: isStepActive(1) ? 'translateY(0)' : 'translateY(20px)',
-                opacity: isStepActive(1) ? 1 : 0,
-                transition: 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease',
               }}
             >
               <span
@@ -177,15 +243,13 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
                 }}
               />
               <span>{t.badge}</span>
-            </div>
+            </motion.div>
 
             {/* Greeting & Name (Step 2) */}
-            <div
+            <motion.div
+              variants={nameVariants}
               style={{
                 marginBottom: '1.25rem',
-                transform: isStepActive(2) ? 'translateY(0)' : 'translateY(25px)',
-                opacity: isStepActive(2) ? 1 : 0,
-                transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s ease',
               }}
             >
               <span
@@ -211,10 +275,11 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
               >
                 {t.name}
               </h1>
-            </div>
+            </motion.div>
 
-            {/* Main Headline revealed Word by Word (Step 3) */}
-            <h2
+            {/* Main Headline revealed Word by Word (Step 3: starts after photo assembly) */}
+            <motion.h2
+              variants={headlineContainerVariants}
               style={{
                 fontSize: 'clamp(1.35rem, 2.6vw, 1.95rem)',
                 fontWeight: 700,
@@ -239,29 +304,21 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
                     verticalAlign: 'bottom',
                   }}
                 >
-                  <span
+                  <motion.span
+                    variants={headlineWordVariants}
                     style={{
                       display: 'inline-block',
-                      transform: isStepActive(3) ? 'translateY(0)' : 'translateY(115%)',
-                      opacity: isStepActive(3) ? 1 : 0,
-                      transition: `transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.06}s, opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 0.06}s`,
                     }}
                   >
                     {word}
-                  </span>
+                  </motion.span>
                 </span>
               ))}
               <span>"</span>
-            </h2>
+            </motion.h2>
 
-            {/* Subheadline description with Scroll Highlight (Step 4) */}
-            <div
-              style={{
-                transform: isStepActive(4) ? 'translateY(0)' : 'translateY(20px)',
-                opacity: isStepActive(4) ? 1 : 0,
-                transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s ease',
-              }}
-            >
+            {/* Subheadline description with Scroll Highlight (Step 4: appears next with slight delay) */}
+            <motion.div variants={subheadlineVariants}>
               <ScrollHighlightText
                 text={t.subheadline}
                 style={{
@@ -273,32 +330,41 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
                 activeColor="var(--hero-text)"
                 mutedColor="var(--hero-muted)"
               />
-            </div>
+            </motion.div>
 
-            {/* Call to Actions with Magnetic Motion (Step 5) */}
-            <div
+            {/* Call to Actions with Motion & Magnetic Interaction (Step 5: coordinated staggered buttons) */}
+            <motion.div
+              variants={actionsContainerVariants}
               style={{
                 display: 'flex',
                 flexWrap: 'wrap',
                 alignItems: 'center',
                 gap: '1rem',
                 marginBottom: '2.75rem',
-                transform: isStepActive(5) ? 'translateY(0)' : 'translateY(20px)',
-                opacity: isStepActive(5) ? 1 : 0,
-                transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s ease',
               }}
             >
               <Magnetic strength={0.22}>
-                <a href="#projects" className="btn-primary">
+                <motion.a
+                  href="#projects"
+                  className="btn-primary"
+                  variants={actionButtonVariants}
+                  whileHover={{ y: -3, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <span>{t.ctaProjects}</span>
                   <ArrowDown size={16} />
-                </a>
+                </motion.a>
               </Magnetic>
 
               <Magnetic strength={0.22}>
-                <a
+                <motion.a
                   href="#yoga"
                   className="btn-secondary"
+                  variants={actionButtonVariants}
+                  whileHover={{ y: -3, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
                   style={{
                     borderColor: 'var(--yoga-border)',
                     color: 'var(--yoga-accent)',
@@ -307,28 +373,34 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
                 >
                   <Compass size={16} />
                   <span>{t.ctaInner}</span>
-                </a>
+                </motion.a>
               </Magnetic>
 
               <Magnetic strength={0.22}>
-                <a href="#contact" className="btn-secondary">
+                <motion.a
+                  href="#contact"
+                  className="btn-secondary"
+                  variants={actionButtonVariants}
+                  whileHover={{ y: -3, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <span>{t.ctaContact}</span>
-                </a>
+                </motion.a>
               </Magnetic>
-            </div>
+            </motion.div>
 
-            {/* Verified Social Links (Step 6) */}
-            <div
+            {/* Verified Social Links with Motion (Step 6: progressive badge & links) */}
+            <motion.div
+              variants={socialContainerVariants}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '1.5rem',
-                transform: isStepActive(6) ? 'translateY(0)' : 'translateY(15px)',
-                opacity: isStepActive(6) ? 1 : 0,
-                transition: 'transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s ease',
               }}
             >
-              <span
+              <motion.span
+                variants={socialItemVariants}
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.75rem',
@@ -338,14 +410,17 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
                 }}
               >
                 VERIFIED LINKS
-              </span>
+              </motion.span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
                 <Magnetic strength={0.3}>
-                  <a
+                  <motion.a
                     href="https://github.com/dibash792"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Dibash Lamichhane GitHub Profile"
+                    variants={socialItemVariants}
+                    whileHover={{ scale: 1.08, borderColor: 'var(--hero-accent)', color: 'var(--hero-accent)' }}
+                    whileTap={{ scale: 0.95 }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -356,27 +431,22 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
                       background: 'var(--hero-surface)',
                       border: '1px solid var(--border-subtle)',
                       color: 'var(--hero-text)',
-                      transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--hero-accent)';
-                      e.currentTarget.style.color = 'var(--hero-accent)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--border-subtle)';
-                      e.currentTarget.style.color = 'var(--hero-text)';
+                      transition: 'border-color 0.2s ease, color 0.2s ease',
                     }}
                   >
                     <GithubIcon size={19} />
-                  </a>
+                  </motion.a>
                 </Magnetic>
 
                 <Magnetic strength={0.3}>
-                  <a
+                  <motion.a
                     href="https://www.linkedin.com/in/dibash-lamichhane-47871b434"
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Dibash Lamichhane LinkedIn Profile"
+                    variants={socialItemVariants}
+                    whileHover={{ scale: 1.08, borderColor: 'var(--hero-accent)', color: 'var(--hero-accent)' }}
+                    whileTap={{ scale: 0.95 }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -387,183 +457,33 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
                       background: 'var(--hero-surface)',
                       border: '1px solid var(--border-subtle)',
                       color: 'var(--hero-text)',
-                      transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--hero-accent)';
-                      e.currentTarget.style.color = 'var(--hero-accent)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--border-subtle)';
-                      e.currentTarget.style.color = 'var(--hero-text)';
+                      transition: 'border-color 0.2s ease, color 0.2s ease',
                     }}
                   >
                     <LinkedinIcon size={19} />
-                  </a>
+                  </motion.a>
                 </Magnetic>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Right Column: 3D Tilting Interactive Portrait Experience with Cinematic Settle */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              perspective: '1200px',
-            }}
-          >
-            <div
-              ref={cardRef}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              style={{
-                position: 'relative',
-                width: '100%',
-                maxWidth: '400px',
-                aspectRatio: '4 / 5',
-                borderRadius: '24px',
-                transform: introPhase === 'intro'
-                  ? 'perspective(1000px) scale(1.05) translateZ(40px)'
-                  : `perspective(1000px) scale(1) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
-                transformStyle: 'preserve-3d',
-                transition: introPhase === 'transitioning'
-                  ? 'transform 1.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 1.3s ease'
-                  : 'transform 0.15s ease-out, box-shadow 0.15s ease-out',
-                boxShadow:
-                  '0 30px 60px -15px rgba(0, 0, 0, 0.75), 0 0 45px var(--hero-accent-glow)',
-                cursor: 'pointer',
-              }}
-            >
-              {/* Image Frame */}
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  borderRadius: '24px',
-                  overflow: 'hidden',
-                  border: '1px solid var(--hero-border)',
-                  background: '#04060a',
-                }}
-              >
-                <img
-                  src="/dibash-portrait.jpg"
-                  alt="Dibash Lamichhane"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    filter: 'contrast(1.05) brightness(1.02)',
-                  }}
-                />
-
-                {/* Specular Dynamic Light Sheen */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: `radial-gradient(circle at ${tilt.glowX}% ${tilt.glowY}%, rgba(255, 255, 255, 0.28) 0%, transparent 60%)`,
-                    pointerEvents: 'none',
-                    mixBlendMode: 'overlay',
-                  }}
-                />
-
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: '40%',
-                    background: 'linear-gradient(to top, rgba(5, 7, 12, 0.95), transparent)',
-                    pointerEvents: 'none',
-                  }}
-                />
-              </div>
-
-              {/* Floating 3D HUD Badges (Step 6) */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-15px',
-                  right: '-15px',
-                  padding: '0.65rem 1rem',
-                  borderRadius: '12px',
-                  background: 'var(--hero-surface)',
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
-                  border: '1px solid var(--hero-border)',
-                  boxShadow: 'var(--shadow-3d)',
-                  transform: isStepActive(6) ? 'translateZ(40px)' : 'translateZ(10px) translateY(10px)',
-                  opacity: isStepActive(6) ? 1 : 0,
-                  transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.78rem',
-                  color: 'var(--hero-text)',
-                  fontWeight: 600,
-                }}
-              >
-                <Sparkles size={14} color="var(--hero-accent)" />
-                <span>{t.stats.role}</span>
-              </div>
-
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: '18px',
-                  left: '18px',
-                  right: '18px',
-                  padding: '0.85rem 1.15rem',
-                  borderRadius: '16px',
-                  background: 'var(--hero-surface)',
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
-                  border: '1px solid var(--border-subtle)',
-                  transform: isStepActive(6) ? 'translateZ(30px)' : 'translateZ(10px) translateY(10px)',
-                  opacity: isStepActive(6) ? 1 : 0,
-                  transition: 'all 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.35rem',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.45rem',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.72rem',
-                    color: 'var(--hero-accent)',
-                    letterSpacing: '0.08em',
-                  }}
-                >
-                  <BookOpen size={12} />
-                  <span>{t.stats.academic}</span>
-                </div>
-                <div
-                  style={{
-                    fontSize: '0.84rem',
-                    fontWeight: 600,
-                    color: 'var(--hero-text)',
-                  }}
-                >
-                  {t.stats.teaching}
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Right Column: Interactive 3D Cybernetic ID Credential Card */}
+          <InteractiveIDCard language={language} theme={theme} isRevealed={isCardActive} />
         </div>
       </div>
 
-      {/* Scroll Down Cue (Step 7) */}
-      <a
+      {/* Scroll Down Cue with Motion */}
+      <motion.a
         href="#about"
         aria-label="Scroll to about section"
+        initial={{ opacity: 0, y: -8 }}
+        animate={
+          isTextActive
+            ? { opacity: 0.75, y: 0 }
+            : { opacity: 0, y: -8 }
+        }
+        transition={{ delay: 2.25, duration: 0.7 }}
+        whileHover={{ opacity: 1, scale: 1.05 }}
         style={{
           position: 'absolute',
           bottom: '1.75rem',
@@ -577,16 +497,12 @@ export const Hero: React.FC<HeroProps> = ({ language, theme = 'dark', introPhase
           fontSize: '0.72rem',
           letterSpacing: '0.14em',
           color: 'var(--hero-muted)',
-          opacity: isStepActive(7) ? 0.75 : 0,
-          transition: 'opacity 0.8s ease',
           zIndex: 3,
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--hero-accent)')}
-        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--hero-muted)')}
       >
         <span>EXPLORE JOURNEY</span>
         <ArrowDown size={14} style={{ animation: 'bounceSoft 2s infinite ease-in-out' }} />
-      </a>
+      </motion.a>
 
       <style>{`
         @keyframes bounceSoft {

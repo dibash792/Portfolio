@@ -3,7 +3,12 @@
    Multi-Atmosphere Aesthetic Engine & Kinetic Typography
    ============================================================ */
 
+/* ------------------------------------------------------------
+   THEME A: COOL BLUE ATMOSPHERE (Default / Dark)
+   Deep indigo, sapphire and midnight surfaces with electric cyan accents
+   ------------------------------------------------------------ */
 :root,
+[data-theme='cool-blue'],
 [data-theme='dark'] {
   /* Typography Tokens */
   --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -26,157 +31,165 @@
   --transition-slow: 0.65s var(--ease-cinematic);
 
   /* --------------------------------------------------------
-     SECTION-SPECIFIC ATMOSPHERES (DARK THEME)
+     SECTION-SPECIFIC ATMOSPHERES (COOL BLUE THEME)
      -------------------------------------------------------- */
 
-  /* 1. HERO — Dark Cinematic Digital Universe */
-  --hero-bg: #05070c;
-  --hero-surface: rgba(11, 15, 25, 0.85);
-  --hero-border: rgba(0, 242, 254, 0.25);
+  /* 1. HERO — Deep Midnight Digital Universe */
+  --hero-bg: #040711;
+  --hero-surface: rgba(8, 14, 28, 0.88);
+  --hero-border: rgba(0, 242, 254, 0.28);
   --hero-accent: #00f2fe;
-  --hero-accent-glow: rgba(0, 242, 254, 0.35);
+  --hero-accent-glow: rgba(0, 242, 254, 0.38);
   --hero-text: #f8fafc;
   --hero-muted: #94a3b8;
 
-  /* 2. ABOUT — Editorial & Personal (Warm Stone Slate) */
-  --about-bg: #0c0e14;
-  --about-surface: rgba(23, 23, 31, 0.85);
-  --about-border: rgba(245, 158, 11, 0.18);
-  --about-accent: #f59e0b;
+  /* 2. ABOUT — Deep Indigo Editorial Slate */
+  --about-bg: rgba(6, 11, 23, 0.75);
+  --about-surface: rgba(10, 18, 36, 0.88);
+  --about-border: rgba(56, 189, 248, 0.22);
+  --about-accent: #38bdf8;
   --about-text: #f8fafc;
-  --about-muted: #a8a29e;
+  --about-muted: #94a3b8;
 
-  /* 3. PROJECTS — Experimental Workshop (Acid-Lime & Deep Graphite) */
-  --projects-bg: #090c10;
-  --projects-surface: rgba(15, 20, 27, 0.85);
-  --projects-border: rgba(163, 230, 53, 0.25);
-  --projects-accent: #a3e635;
-  --projects-accent-glow: rgba(163, 230, 53, 0.3);
+  /* 3. PROJECTS — Experimental Digital Workshop */
+  --projects-bg: rgba(5, 9, 20, 0.78);
+  --projects-surface: rgba(9, 16, 32, 0.88);
+  --projects-border: rgba(0, 242, 254, 0.26);
+  --projects-accent: #00f2fe;
+  --projects-accent-glow: rgba(0, 242, 254, 0.32);
   --projects-text: #f8fafc;
   --projects-muted: #94a3b8;
 
-  /* 4. SKILLS — Creative Technical Lab (Electric Violet & Emerald) */
-  --skills-bg: #0c0b14;
-  --skills-surface: rgba(20, 18, 33, 0.85);
-  --skills-border: rgba(192, 132, 252, 0.25);
-  --skills-accent: #c084fc;
-  --skills-accent-glow: rgba(192, 132, 252, 0.3);
+  /* 4. SKILLS — Creative Azure Lab */
+  --skills-bg: rgba(6, 11, 24, 0.75);
+  --skills-surface: rgba(11, 19, 38, 0.88);
+  --skills-border: rgba(96, 165, 250, 0.26);
+  --skills-accent: #60a5fa;
+  --skills-accent-glow: rgba(96, 165, 250, 0.32);
   --skills-text: #f8fafc;
-  --skills-muted: #a1a1aa;
+  --skills-muted: #94a3b8;
 
-  /* 5. JOURNEY — Warm Credible Story (Terracotta & Bronze) */
-  --journey-bg: #0e0d12;
-  --journey-surface: rgba(26, 21, 26, 0.85);
-  --journey-border: rgba(234, 88, 12, 0.25);
-  --journey-accent: #ea580c;
-  --journey-accent-glow: rgba(234, 88, 12, 0.3);
+  /* 5. JOURNEY — Luminous Indigo Timeline */
+  --journey-bg: rgba(7, 12, 26, 0.78);
+  --journey-surface: rgba(12, 21, 42, 0.88);
+  --journey-border: rgba(56, 189, 248, 0.26);
+  --journey-accent: #38bdf8;
+  --journey-accent-glow: rgba(56, 189, 248, 0.32);
   --journey-text: #f8fafc;
-  --journey-muted: #a8a29e;
+  --journey-muted: #94a3b8;
 
-  /* 6. YOGA & INNER PEACE — World B (Earthy Sage, Sand & Gold Sanctuary) */
-  --yoga-bg: #080f0a;
-  --yoga-surface: rgba(14, 27, 18, 0.8);
-  --yoga-border: rgba(74, 222, 128, 0.25);
-  --yoga-accent: #4ade80;
-  --yoga-accent-gold: #eab308;
-  --yoga-accent-glow: rgba(74, 222, 128, 0.25);
-  --yoga-text: #f0fdf4;
-  --yoga-muted: #86efac;
+  /* 6. YOGA & INNER PEACE — Ocean Cyan & Sage Sanctuary */
+  --yoga-bg: rgba(5, 14, 20, 0.82);
+  --yoga-surface: rgba(9, 24, 28, 0.88);
+  --yoga-border: rgba(45, 212, 191, 0.28);
+  --yoga-accent: #2dd4bf;
+  --yoga-accent-gold: #38bdf8;
+  --yoga-accent-glow: rgba(45, 212, 191, 0.28);
+  --yoga-text: #f0fdfa;
+  --yoga-muted: #99f6e4;
 
-  /* 7. CONTACT — Deep Obsidian & Metallic Copper */
-  --contact-bg: #06070a;
-  --contact-surface: rgba(14, 16, 22, 0.85);
-  --contact-border: rgba(249, 115, 22, 0.25);
-  --contact-accent: #f97316;
+  /* 7. CONTACT — Deep Obsidian & Electric Azure */
+  --contact-bg: rgba(4, 7, 17, 0.78);
+  --contact-surface: rgba(8, 14, 28, 0.88);
+  --contact-border: rgba(0, 242, 254, 0.26);
+  --contact-accent: #00f2fe;
   --contact-text: #f8fafc;
   --contact-muted: #94a3b8;
 
   /* Global defaults */
   --bg-primary: var(--hero-bg);
+  --bg-secondary: #070c1a;
+  --bg-card: rgba(10, 18, 36, 0.82);
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-tertiary: #64748b;
   --accent-cyan: #00f2fe;
-  --accent-cyan-glow: rgba(0, 242, 254, 0.35);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --shadow-3d: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  --accent-cyan-glow: rgba(0, 242, 254, 0.38);
+  --border-subtle: rgba(56, 189, 248, 0.14);
+  --shadow-3d: 0 20px 45px -15px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 242, 254, 0.12);
+  --btn-gradient: linear-gradient(135deg, #00f2fe, #2563eb);
 }
 
 /* ------------------------------------------------------------
-   THEME: LIGHT
+   THEME B: WARM VIOLET ATMOSPHERE
+   Soft violet, lavender, royal amethyst & plum tones (Not plain white!)
    ------------------------------------------------------------ */
+[data-theme='warm-violet'],
 [data-theme='light'] {
-  /* 1. HERO — Clean High-Contrast Tech */
-  --hero-bg: #f8fafc;
-  --hero-surface: rgba(255, 255, 255, 0.9);
-  --hero-border: rgba(2, 132, 199, 0.25);
-  --hero-accent: #0284c7;
-  --hero-accent-glow: rgba(2, 132, 199, 0.2);
-  --hero-text: #0f172a;
-  --hero-muted: #475569;
+  /* 1. HERO — Royal Amethyst Universe */
+  --hero-bg: #0d0817;
+  --hero-surface: rgba(23, 15, 38, 0.88);
+  --hero-border: rgba(192, 132, 252, 0.32);
+  --hero-accent: #c084fc;
+  --hero-accent-glow: rgba(192, 132, 252, 0.42);
+  --hero-text: #fdf4ff;
+  --hero-muted: #d8b4fe;
 
-  /* 2. ABOUT — Editorial Warm Stone */
-  --about-bg: #f5f5f4;
-  --about-surface: rgba(255, 255, 255, 0.92);
-  --about-border: rgba(180, 83, 9, 0.22);
-  --about-accent: #b45309;
-  --about-text: #1c1917;
-  --about-muted: #57534e;
+  /* 2. ABOUT — Soft Plum Velvet */
+  --about-bg: rgba(16, 10, 28, 0.75);
+  --about-surface: rgba(27, 18, 46, 0.88);
+  --about-border: rgba(216, 180, 254, 0.26);
+  --about-accent: #e879f9;
+  --about-text: #fdf4ff;
+  --about-muted: #c4b5fd;
 
-  /* 3. PROJECTS — Vivid Graphite Workshop */
-  --projects-bg: #f1f5f9;
-  --projects-surface: rgba(255, 255, 255, 0.92);
-  --projects-border: rgba(101, 163, 13, 0.35);
-  --projects-accent: #4d7c0f;
-  --projects-accent-glow: rgba(101, 163, 13, 0.2);
-  --projects-text: #0f172a;
-  --projects-muted: #475569;
+  /* 3. PROJECTS — Amethyst Workshop */
+  --projects-bg: rgba(15, 9, 25, 0.78);
+  --projects-surface: rgba(25, 16, 44, 0.88);
+  --projects-border: rgba(192, 132, 252, 0.32);
+  --projects-accent: #c084fc;
+  --projects-accent-glow: rgba(192, 132, 252, 0.38);
+  --projects-text: #fdf4ff;
+  --projects-muted: #d8b4fe;
 
-  /* 4. SKILLS — Violet Lab Light */
-  --skills-bg: #faf5ff;
-  --skills-surface: rgba(255, 255, 255, 0.92);
-  --skills-border: rgba(147, 51, 234, 0.25);
-  --skills-accent: #7e22ce;
-  --skills-accent-glow: rgba(147, 51, 234, 0.18);
-  --skills-text: #1e1b4b;
-  --skills-muted: #581c87;
+  /* 4. SKILLS — Luminous Lavender Lab */
+  --skills-bg: rgba(18, 11, 32, 0.75);
+  --skills-surface: rgba(30, 20, 52, 0.88);
+  --skills-border: rgba(232, 121, 249, 0.28);
+  --skills-accent: #e879f9;
+  --skills-accent-glow: rgba(232, 121, 249, 0.34);
+  --skills-text: #fdf4ff;
+  --skills-muted: #d8b4fe;
 
-  /* 5. JOURNEY — Terracotta Editorial */
-  --journey-bg: #fff7ed;
-  --journey-surface: rgba(255, 255, 255, 0.92);
-  --journey-border: rgba(194, 65, 12, 0.25);
-  --journey-accent: #c2410c;
-  --journey-accent-glow: rgba(194, 65, 12, 0.2);
-  --journey-text: #431407;
-  --journey-muted: #7c2d12;
+  /* 5. JOURNEY — Dusk Orchid Timeline */
+  --journey-bg: rgba(19, 12, 34, 0.78);
+  --journey-surface: rgba(33, 21, 56, 0.88);
+  --journey-border: rgba(168, 85, 247, 0.28);
+  --journey-accent: #a855f7;
+  --journey-accent-glow: rgba(168, 85, 247, 0.34);
+  --journey-text: #fdf4ff;
+  --journey-muted: #c4b5fd;
 
-  /* 6. YOGA & INNER PEACE — Natural Ivory, Sage & Sand */
-  --yoga-bg: #f6fbf7;
-  --yoga-surface: rgba(255, 255, 255, 0.95);
-  --yoga-border: rgba(22, 101, 52, 0.25);
-  --yoga-accent: #15803d;
-  --yoga-accent-gold: #b45309;
-  --yoga-accent-glow: rgba(22, 101, 52, 0.15);
-  --yoga-text: #14532d;
-  --yoga-muted: #166534;
+  /* 6. YOGA & INNER PEACE — Rose Quartz & Warm Amber Sanctuary */
+  --yoga-bg: rgba(20, 9, 26, 0.82);
+  --yoga-surface: rgba(34, 18, 46, 0.88);
+  --yoga-border: rgba(244, 114, 182, 0.28);
+  --yoga-accent: #f472b6;
+  --yoga-accent-gold: #facc15;
+  --yoga-accent-glow: rgba(244, 114, 182, 0.3);
+  --yoga-text: #fdf2f8;
+  --yoga-muted: #fbcfe8;
 
-  /* 7. CONTACT — Deep Warm Slate */
-  --contact-bg: #f8fafc;
-  --contact-surface: rgba(255, 255, 255, 0.92);
-  --contact-border: rgba(234, 88, 12, 0.25);
-  --contact-accent: #c2410c;
-  --contact-text: #0f172a;
-  --contact-muted: #475569;
+  /* 7. CONTACT — Deep Purple Obsidian */
+  --contact-bg: rgba(13, 8, 23, 0.78);
+  --contact-surface: rgba(23, 15, 38, 0.88);
+  --contact-border: rgba(192, 132, 252, 0.3);
+  --contact-accent: #c084fc;
+  --contact-text: #fdf4ff;
+  --contact-muted: #d8b4fe;
 
   /* Global defaults */
   --bg-primary: var(--hero-bg);
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #64748b;
-  --accent-cyan: #0284c7;
-  --accent-cyan-glow: rgba(2, 132, 199, 0.25);
-  --border-subtle: rgba(15, 23, 42, 0.1);
-  --shadow-3d: 0 15px 35px -10px rgba(15, 23, 42, 0.12);
+  --bg-secondary: #130c22;
+  --bg-card: rgba(28, 18, 50, 0.82);
+  --text-primary: #fdf4ff;
+  --text-secondary: #d8b4fe;
+  --text-tertiary: #a78bfa;
+  --accent-cyan: #c084fc;
+  --accent-cyan-glow: rgba(192, 132, 252, 0.42);
+  --border-subtle: rgba(192, 132, 252, 0.18);
+  --shadow-3d: 0 20px 45px -15px rgba(0, 0, 0, 0.8), 0 0 28px rgba(192, 132, 252, 0.16);
+  --btn-gradient: linear-gradient(135deg, #c084fc, #7c3aed);
 }
 
 /* ------------------------------------------------------------
@@ -200,7 +213,7 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
-  transition: background-color 0.4s ease, color 0.4s ease;
+  transition: background-color 0.5s var(--ease-cinematic), color 0.4s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -311,10 +324,10 @@ img {
   font-weight: 600;
   font-size: 0.95rem;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--accent-cyan), #3b82f6);
-  color: #000;
+  background: var(--btn-gradient);
+  color: #fff;
   box-shadow: 0 4px 20px var(--accent-cyan-glow);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast), background 0.5s ease;
 }
 
 .btn-primary:hover {

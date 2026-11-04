@@ -67,7 +67,7 @@ export const Timeline: React.FC<TimelineProps> = ({ language }) => {
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 color: 'var(--journey-accent)',
-                background: 'rgba(234, 88, 12, 0.08)',
+                background: 'rgba(56, 189, 248, 0.08)',
                 border: '1px solid var(--journey-border)',
                 borderRadius: 'var(--radius-full)',
                 marginBottom: '1rem',

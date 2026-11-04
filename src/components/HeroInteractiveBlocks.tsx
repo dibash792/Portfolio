@@ -39,6 +39,7 @@ export const HeroInteractiveBlocks: React.FC<HeroInteractiveBlocksProps> = ({
 
     let handleMouseMove: ((e: MouseEvent) => void) | null = null;
     let handleResize: (() => void) | null = null;
+    let handleVisibilityChange: (() => void) | null = null;
 
     try {
       const width = container.clientWidth || window.innerWidth;
@@ -54,29 +55,35 @@ export const HeroInteractiveBlocks: React.FC<HeroInteractiveBlocksProps> = ({
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       container.appendChild(renderer.domElement);
 
-      const isDark = theme === 'dark';
+      const isViolet = theme === 'warm-violet' || theme === 'light';
 
-      // 2. Colors based on theme
-      const primaryBlue = isDark ? 0x00f2fe : 0x0284c7; // Cyan / Azure
-      const deepBlue = isDark ? 0x0369a1 : 0x0284c7;
-      const wireframeColor = isDark ? 0x38bdf8 : 0x0284c7;
+      // 2. Atmosphere-coordinated color palette
+      const primaryColor = isViolet ? 0xc084fc : 0x00f2fe; // Amethyst vs Electric Cyan
+      const deepColor = isViolet ? 0x7c3aed : 0x0369a1;    // Royal Violet vs Ocean Azure
+      const accentColor = isViolet ? 0xe879f9 : 0x38bdf8;  // Orchid Lavender vs Sky Azure
+      const wireframeColor = isViolet ? 0xf472b6 : 0x38bdf8; // Rose Violet vs Neon Azure
 
       // Lighting for depth
-      const ambientLight = new THREE.AmbientLight(0xffffff, isDark ? 0.85 : 1.2);
+      const ambientLight = new THREE.AmbientLight(0xffffff, isViolet ? 0.95 : 0.85);
       scene.add(ambientLight);
 
-      const dirLight = new THREE.DirectionalLight(0xffffff, isDark ? 1.4 : 1.8);
+      const dirLight = new THREE.DirectionalLight(0xffffff, isViolet ? 1.5 : 1.4);
       dirLight.position.set(40, 60, 50);
       scene.add(dirLight);
 
-      const bluePointLight = new THREE.PointLight(primaryBlue, isDark ? 3.5 : 2.5, 120);
-      bluePointLight.position.set(-20, 10, 30);
-      scene.add(bluePointLight);
+      const themePointLight = new THREE.PointLight(primaryColor, 3.5, 130);
+      themePointLight.position.set(-20, 10, 30);
+      scene.add(themePointLight);
+
+      // Subtle fill light on right
+      const fillPointLight = new THREE.PointLight(accentColor, 1.8, 100);
+      fillPointLight.position.set(30, -20, 20);
+      scene.add(fillPointLight);
 
       // 3. Create field of Large and Small Interactive Blue Blocks
       // Distributed across hero space (accentuating background without obscuring center content)
       const isMobile = window.innerWidth < 768;
-      const blockCount = isMobile ? 18 : 34;
+      const blockCount = isMobile ? 16 : 28;
 
       // Block size tiers: large, medium, small, micro
       const sizeTiers = [
@@ -115,7 +122,7 @@ export const HeroInteractiveBlocks: React.FC<HeroInteractiveBlocksProps> = ({
           const lineMat = new THREE.LineBasicMaterial({
             color: wireframeColor,
             transparent: true,
-            opacity: isDark ? 0.75 : 0.6,
+            opacity: 0.75,
             linewidth: 1.5,
           });
           materialsToDispose.push(lineMat);
@@ -125,20 +132,20 @@ export const HeroInteractiveBlocks: React.FC<HeroInteractiveBlocksProps> = ({
 
           // Subtle inner core
           const innerMat = new THREE.MeshBasicMaterial({
-            color: deepBlue,
+            color: deepColor,
             transparent: true,
-            opacity: isDark ? 0.12 : 0.08,
+            opacity: 0.14,
           });
           materialsToDispose.push(innerMat);
           group.add(new THREE.Mesh(boxGeo, innerMat));
         } else {
-          // Solid translucent blue block
+          // Solid translucent atmospheric block
           const boxMat = new THREE.MeshStandardMaterial({
-            color: Math.random() > 0.4 ? primaryBlue : deepBlue,
-            roughness: 0.25,
-            metalness: 0.4,
+            color: Math.random() > 0.4 ? primaryColor : deepColor,
+            roughness: 0.22,
+            metalness: 0.45,
             transparent: true,
-            opacity: isDark ? 0.45 : 0.35,
+            opacity: 0.45,
           });
           materialsToDispose.push(boxMat);
 
@@ -151,7 +158,7 @@ export const HeroInteractiveBlocks: React.FC<HeroInteractiveBlocksProps> = ({
           const edgeMat = new THREE.LineBasicMaterial({
             color: wireframeColor,
             transparent: true,
-            opacity: isDark ? 0.6 : 0.45,
+            opacity: 0.65,
           });
           materialsToDispose.push(edgeMat);
           group.add(new THREE.LineSegments(edgesGeo, edgeMat));
@@ -214,8 +221,22 @@ export const HeroInteractiveBlocks: React.FC<HeroInteractiveBlocksProps> = ({
 
       // 5. Animation Loop
       let clock = new THREE.Clock();
+      let isVisible = true;
+
+      handleVisibilityChange = () => {
+        isVisible = !document.hidden;
+        if (isVisible && !animId) {
+          clock.start();
+          animate();
+        }
+      };
+      document.addEventListener('visibilitychange', handleVisibilityChange);
 
       const animate = () => {
+        if (!isVisible) {
+          animId = null;
+          return;
+        }
         animId = requestAnimationFrame(animate);
         const elapsedTime = clock.getElapsedTime();
 
@@ -256,6 +277,7 @@ export const HeroInteractiveBlocks: React.FC<HeroInteractiveBlocksProps> = ({
     }
 
     return () => {
+      if (handleVisibilityChange) document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (animId) cancelAnimationFrame(animId);
       if (handleMouseMove) window.removeEventListener('mousemove', handleMouseMove);
       if (handleResize) window.removeEventListener('resize', handleResize);
@@ -278,7 +300,7 @@ export const HeroInteractiveBlocks: React.FC<HeroInteractiveBlocksProps> = ({
         pointerEvents: 'none',
         zIndex: 0,
         overflow: 'hidden',
-        opacity: isRevealed ? (theme === 'dark' ? 0.95 : 0.75) : 0,
+        opacity: isRevealed ? 0.92 : 0,
         transition: 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     />

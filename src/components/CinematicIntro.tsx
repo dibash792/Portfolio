@@ -18,6 +18,12 @@ interface Fragment {
   id: number;
   cx: number;
   cy: number;
+  origCx: number;
+  origCy: number;
+  drawX: number;
+  drawY: number;
+  drawW: number;
+  drawH: number;
   points: Point[];
   minX: number;
   minY: number;
@@ -41,6 +47,14 @@ interface Fragment {
   scale: number;
   opacity: number;
   canvas: HTMLCanvasElement | null;
+  peakX?: number;
+  peakY?: number;
+  peakZ?: number;
+  peakRotZ?: number;
+  peakScale?: number;
+  targetX?: number;
+  targetY?: number;
+  targetScale?: number;
 }
 
 // Fast Bowyer-Watson Delaunay Triangulation for organic, irregular glass shards
@@ -125,7 +139,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<'loading' | 'suspense' | 'shattering' | 'done'>('loading');
   const [isDissolving, setIsDissolving] = useState(false);
-  const transitionTriggeredRef = useRef(false);
+  const dissolvingTriggeredRef = useRef(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fragmentsRef = useRef<Fragment[]>([]);
   const animationFrameRef = useRef<number | null>(null);
@@ -139,7 +153,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
     onComplete();
   };
 
-  // Preload portrait image and run a deliberate 4.2-second smooth progress progression
+  // Preload portrait image and run a deliberate 1.3-second smooth progress progression
   useEffect(() => {
     let isMounted = true;
     const img = new Image();
@@ -147,7 +161,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
     imgRef.current = img;
 
     const startTime = performance.now();
-    const targetDuration = 3800; // ms for 0% -> 100%
+    const targetDuration = 1300; // Snappy & efficient 1.3s progression (0% -> 100%)
 
     const updateProgress = (now: number) => {
       if (!isMounted) return;
@@ -180,7 +194,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
     };
   }, []);
 
-  // When 100% is reached: hold suspense for 750ms, then trigger shattering
+  // When 100% is reached: hold suspense for 200ms, then trigger shattering
   useEffect(() => {
     if (phase !== 'suspense') return;
 
@@ -192,7 +206,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
         console.warn('Canvas shard error fallback:', err);
         skip();
       }
-    }, 750); // 750ms suspense pause
+    }, 200); // Crisp 200ms suspense breath before shattering
 
     return () => clearTimeout(timer);
   }, [phase]);
@@ -359,6 +373,12 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
         id: i,
         cx,
         cy,
+        origCx: cx,
+        origCy: cy,
+        drawX,
+        drawY,
+        drawW,
+        drawH,
         points: poly.map((p) => ({ x: p.x - cx, y: p.y - cy })),
         minX,
         minY,
@@ -388,7 +408,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
     fragmentsRef.current = fragments;
   };
 
-  // Run the 3D scattering physics animation loop
+  // Run the 3D scattering & magnetic reassembly physics animation loop
   useEffect(() => {
     if (phase !== 'shattering') return;
 
@@ -404,73 +424,289 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
     }
 
     const startTime = performance.now();
-    const duration = 2300; // ms for shatter dispersal
+    const shatterDuration = 520; // ms for outward burst
+    const apexDuration = 80; // ms for natural floating apex suspension
+    const reassembleDuration = 720; // ms for smooth, natural magnetic convergence
+    const healDuration = 320; // ms for seam healing light wave
+    const settleDuration = 460; // ms for seamless glide & dock into hero layout
+    const totalDuration = shatterDuration + apexDuration + reassembleDuration + healDuration + settleDuration;
+
+    let peakCaptured = false;
 
     const render = (now: number) => {
       const elapsed = now - startTime;
-      const progressRatio = Math.min(elapsed / duration, 1);
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      let visibleCount = 0;
       const fragments = fragmentsRef.current;
+      const fov = 650;
 
-      for (let i = 0; i < fragments.length; i++) {
-        const frag = fragments[i];
+      // Base dimensions of the central portrait
+      const baseDrawW = fragments[0]?.drawW || 320;
+      const baseDrawH = fragments[0]?.drawH || 400;
+      const baseDrawX = fragments[0]?.drawX || (canvas.width / 2 - baseDrawW / 2);
+      const baseDrawY = fragments[0]?.drawY || (canvas.height / 2 - baseDrawH / 2 - 25);
 
-        if (frag.delay > 0) {
-          frag.delay -= 1;
-          if (frag.canvas) {
-            ctx.drawImage(frag.canvas, frag.minX, frag.minY, frag.width, frag.height);
+      // PHASE 1: Outward 3D Dispersal Burst (0 -> 520ms)
+      if (elapsed <= shatterDuration) {
+        for (let i = 0; i < fragments.length; i++) {
+          const frag = fragments[i];
+
+          if (frag.delay > 0) {
+            frag.delay -= 1;
+            if (frag.canvas) {
+              ctx.drawImage(frag.canvas, frag.minX, frag.minY, frag.width, frag.height);
+            }
+            continue;
           }
-          visibleCount++;
-          continue;
+
+          frag.x += frag.vx;
+          frag.y += frag.vy;
+          frag.z += frag.vz;
+          frag.rotX += frag.vRotX;
+          frag.rotY += frag.vRotY;
+          frag.rotZ += frag.vRotZ;
+
+          // Controlled natural deceleration so shards hang at apex
+          frag.vx *= 0.94;
+          frag.vy *= 0.94;
+          frag.vz *= 0.94;
+
+          const scale3d = Math.max((fov + frag.z) / fov, 0.2);
+
+          if (frag.canvas) {
+            ctx.save();
+            ctx.translate(frag.x, frag.y);
+            ctx.rotate(frag.rotZ);
+            ctx.scale(scale3d, scale3d);
+            ctx.globalAlpha = 1;
+
+            const halfW = frag.width / 2;
+            const halfH = frag.height / 2;
+            ctx.drawImage(frag.canvas, -halfW, -halfH, frag.width, frag.height);
+
+            // Specular fractured rim glow
+            ctx.strokeStyle = 'rgba(0, 242, 254, 0.85)';
+            ctx.lineWidth = 1.2;
+            ctx.strokeRect(-halfW, -halfH, frag.width, frag.height);
+
+            ctx.restore();
+          }
         }
+      }
 
-        frag.x += frag.vx;
-        frag.y += frag.vy;
-        frag.z += frag.vz;
-        frag.rotX += frag.vRotX;
-        frag.rotY += frag.vRotY;
-        frag.rotZ += frag.vRotZ;
+      // APEX SUSPENSION: Gentle hovering at peak dispersal (520ms -> 600ms)
+      if (elapsed > shatterDuration && elapsed <= shatterDuration + apexDuration) {
+        for (let i = 0; i < fragments.length; i++) {
+          const frag = fragments[i];
 
-        // Deceleration & exponential fade
-        frag.vx *= 0.982;
-        frag.vy *= 0.982;
-        frag.opacity = Math.max(1 - Math.pow(progressRatio, 1.4) * 1.2, 0);
+          frag.vx *= 0.88;
+          frag.vy *= 0.88;
+          frag.vz *= 0.88;
+          frag.vRotZ *= 0.88;
 
-        // Perspective 3D scaling (flying past camera)
-        const fov = 650;
-        const scale3d = Math.max((fov + frag.z) / fov, 0.1);
+          frag.x += frag.vx;
+          frag.y += frag.vy;
+          frag.z += frag.vz;
+          frag.rotZ += frag.vRotZ;
 
-        if (frag.opacity > 0.01 && frag.canvas) {
-          visibleCount++;
+          const scale3d = Math.max((fov + frag.z) / fov, 0.2);
+
+          if (frag.canvas) {
+            ctx.save();
+            ctx.translate(frag.x, frag.y);
+            ctx.rotate(frag.rotZ);
+            ctx.scale(scale3d, scale3d);
+            ctx.globalAlpha = 1;
+
+            const halfW = frag.width / 2;
+            const halfH = frag.height / 2;
+            ctx.drawImage(frag.canvas, -halfW, -halfH, frag.width, frag.height);
+
+            ctx.strokeStyle = 'rgba(0, 242, 254, 0.85)';
+            ctx.lineWidth = 1.2;
+            ctx.strokeRect(-halfW, -halfH, frag.width, frag.height);
+
+            ctx.restore();
+          }
+        }
+      }
+
+      // CAPTURE PEAK DISPERSAL at end of apex (600ms)
+      if (elapsed > shatterDuration + apexDuration && !peakCaptured) {
+        peakCaptured = true;
+
+        for (let i = 0; i < fragments.length; i++) {
+          const f = fragments[i];
+          f.peakX = f.x;
+          f.peakY = f.y;
+          f.peakZ = f.z;
+          f.peakRotZ = f.rotZ;
+          f.peakScale = Math.max((fov + f.z) / fov, 0.2);
+          // Destination is the exact home position where the piece belongs
+          f.targetX = f.origCx;
+          f.targetY = f.origCy;
+          f.targetScale = 1;
+        }
+      }
+
+      // PHASE 2: Coordinated Magnetic Reassembly (600ms -> 1320ms)
+      const reassembleStart = shatterDuration + apexDuration;
+      const reassembleEnd = reassembleStart + reassembleDuration;
+
+      if (elapsed > reassembleStart && elapsed <= reassembleEnd) {
+        const reassembleRatio = Math.min((elapsed - reassembleStart) / reassembleDuration, 1);
+        // Smooth cubic ease-in-out curve: zero initial jerk, natural acceleration and cushioning
+        const ease = reassembleRatio < 0.5
+          ? 4 * reassembleRatio * reassembleRatio * reassembleRatio
+          : 1 - Math.pow(-2 * reassembleRatio + 2, 3) / 2;
+
+        for (let i = 0; i < fragments.length; i++) {
+          const frag = fragments[i];
+          if (
+            !frag.canvas ||
+            frag.peakX === undefined ||
+            frag.peakY === undefined ||
+            frag.peakZ === undefined ||
+            frag.peakRotZ === undefined
+          ) {
+            continue;
+          }
+
+          frag.x = frag.peakX + (frag.origCx - frag.peakX) * ease;
+          frag.y = frag.peakY + (frag.origCy - frag.peakY) * ease;
+          frag.z = frag.peakZ * (1 - ease);
+          frag.rotZ = frag.peakRotZ * (1 - ease);
+          const currentScale = (frag.peakScale || 1) + (1 - (frag.peakScale || 1)) * ease;
+
           ctx.save();
           ctx.translate(frag.x, frag.y);
           ctx.rotate(frag.rotZ);
-          ctx.scale(scale3d, scale3d);
-          ctx.globalAlpha = frag.opacity;
+          ctx.scale(currentScale, currentScale);
+          ctx.globalAlpha = 1;
 
           const halfW = frag.width / 2;
           const halfH = frag.height / 2;
           ctx.drawImage(frag.canvas, -halfW, -halfH, frag.width, frag.height);
 
-          // Specular fractured rim glow
-          ctx.strokeStyle = `rgba(0, 242, 254, ${frag.opacity * 0.8})`;
-          ctx.lineWidth = 1;
-          ctx.strokeRect(-halfW, -halfH, frag.width, frag.height);
+          // Specular fracture seams: bright when traveling, softly fading as pieces fuse
+          const seamAlpha = reassembleRatio < 0.72
+            ? 0.75
+            : Math.max(0, (1 - reassembleRatio) / 0.28 * 0.75);
+
+          if (seamAlpha > 0.02) {
+            ctx.strokeStyle = `rgba(0, 242, 254, ${seamAlpha})`;
+            ctx.lineWidth = Math.max(1, 1.2 * currentScale);
+            ctx.strokeRect(-halfW, -halfH, frag.width, frag.height);
+          }
 
           ctx.restore();
         }
       }
 
-      if (progressRatio >= 0.58 && !transitionTriggeredRef.current) {
-        transitionTriggeredRef.current = true;
-        setIsDissolving(true);
-        if (onTransitionStart) onTransitionStart();
+      // PHASE 3: Reconnection Locked & Seam-Healing Wave (1320ms -> 1640ms)
+      const healStart = reassembleEnd;
+      const healEnd = healStart + healDuration;
+
+      if (elapsed > healStart && elapsed <= healEnd) {
+        const healRatio = Math.min((elapsed - healStart) / healDuration, 1);
+
+        // All fragments locked at 100% position, forming complete photograph
+        for (let i = 0; i < fragments.length; i++) {
+          const frag = fragments[i];
+          if (!frag.canvas) continue;
+
+          ctx.save();
+          ctx.translate(frag.origCx, frag.origCy);
+          ctx.globalAlpha = 1;
+
+          const halfW = frag.width / 2;
+          const halfH = frag.height / 2;
+          ctx.drawImage(frag.canvas, -halfW, -halfH, frag.width, frag.height);
+          ctx.restore();
+        }
+
+        // Luminous seam-healing sweep across assembled photograph
+        if (baseDrawW > 0) {
+          const sweepX = baseDrawX + healRatio * baseDrawW * 1.3 - baseDrawW * 0.15;
+          const grad = ctx.createLinearGradient(sweepX - 55, 0, sweepX + 55, 0);
+          grad.addColorStop(0, 'rgba(0, 242, 254, 0)');
+          grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.9)');
+          grad.addColorStop(1, 'rgba(0, 242, 254, 0)');
+
+          ctx.fillStyle = grad;
+          ctx.fillRect(baseDrawX, baseDrawY, baseDrawW, baseDrawH);
+        }
       }
 
-      if (progressRatio < 1 && visibleCount > 0) {
+      // PHASE 4: Seamless Glide & Settle into Hero Layout (1640ms -> 2100ms)
+      const settleStart = healEnd;
+
+      if (elapsed > settleStart) {
+        // Trigger overlay dissolve and background mounting at settle start
+        if (!dissolvingTriggeredRef.current) {
+          dissolvingTriggeredRef.current = true;
+          setIsDissolving(true);
+          if (onTransitionStart) onTransitionStart();
+        }
+
+        const settleElapsed = elapsed - settleStart;
+        const settleRatio = Math.min(settleElapsed / settleDuration, 1);
+        // Smooth cubic ease-out for natural cushioning
+        const settleEase = 1 - Math.pow(1 - settleRatio, 3);
+
+        // Find hero ID card element in DOM
+        const targetEl = document.getElementById('hero-portrait-card');
+        const targetRect = targetEl ? targetEl.getBoundingClientRect() : null;
+
+        let curX = baseDrawX;
+        let curY = baseDrawY;
+        let curW = baseDrawW;
+        let curH = baseDrawH;
+
+        if (
+          targetRect &&
+          targetRect.width > 0 &&
+          targetRect.height > 0 &&
+          targetRect.top >= 0 &&
+          targetRect.top + targetRect.height * 0.4 <= window.innerHeight
+        ) {
+          curX = baseDrawX + (targetRect.left - baseDrawX) * settleEase;
+          curY = baseDrawY + (targetRect.top - baseDrawY) * settleEase;
+          curW = baseDrawW + (targetRect.width - baseDrawW) * settleEase;
+          curH = baseDrawH + (targetRect.height - baseDrawH) * settleEase;
+        } else {
+          // Fallback if card is below fold on mobile: gently settle in place
+          const breathe = 1 - settleEase * 0.03;
+          curW = baseDrawW * breathe;
+          curH = baseDrawH * breathe;
+          curX = baseDrawX + (baseDrawW - curW) / 2;
+          curY = baseDrawY + (baseDrawH - curH) / 2;
+        }
+
+        const scaleX = curW / baseDrawW;
+        const scaleY = curH / baseDrawH;
+
+        for (let i = 0; i < fragments.length; i++) {
+          const frag = fragments[i];
+          if (!frag.canvas) continue;
+
+          const fragTargetCenterX = curX + (frag.origCx - baseDrawX) * scaleX;
+          const fragTargetCenterY = curY + (frag.origCy - baseDrawY) * scaleY;
+
+          ctx.save();
+          ctx.translate(fragTargetCenterX, fragTargetCenterY);
+          ctx.scale(scaleX, scaleY);
+          ctx.globalAlpha = 1;
+
+          const halfW = frag.width / 2;
+          const halfH = frag.height / 2;
+          ctx.drawImage(frag.canvas, -halfW, -halfH, frag.width, frag.height);
+          ctx.restore();
+        }
+      }
+
+      if (elapsed < totalDuration) {
         animationFrameRef.current = requestAnimationFrame(render);
       } else {
         setPhase('done');
@@ -499,8 +735,8 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
-        transition: isDissolving ? 'opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1)' : 'opacity 0.6s ease',
-        opacity: isDissolving ? 0 : phase === 'shattering' ? 0.96 : 1,
+        transition: isDissolving ? 'opacity 0.46s cubic-bezier(0.16, 1, 0.3, 1)' : 'opacity 0.4s ease',
+        opacity: isDissolving ? 0 : 1,
         pointerEvents: isDissolving ? 'none' : 'auto',
       }}
     >
@@ -513,7 +749,7 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
             background:
               'linear-gradient(105deg, transparent 20%, rgba(0, 242, 254, 0.28) 48%, rgba(255, 255, 255, 0.45) 50%, rgba(0, 242, 254, 0.28) 52%, transparent 80%)',
             pointerEvents: 'none',
-            animation: 'lightSweepAcross 0.75s ease-out forwards',
+            animation: 'lightSweepAcross 0.46s ease-out forwards',
             zIndex: 15,
           }}
         />
@@ -659,19 +895,18 @@ export const CinematicIntro: React.FC<CinematicIntroProps> = ({
             <div
               style={{
                 display: 'flex',
-                justifyContent: 'space-between',
+                justifyContent: 'flex-end',
+                alignItems: 'center',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '0.8rem',
-                color: '#94a3b8',
-                letterSpacing: '0.04em',
+                fontSize: '0.85rem',
               }}
             >
-              <span>{phase === 'suspense' ? t.readyToShatter : t.loadingSubtitle}</span>
               <span
                 style={{
                   color: 'var(--accent-cyan)',
                   fontWeight: 700,
                   fontSize: '0.95rem',
+                  letterSpacing: '0.05em',
                   textShadow: '0 0 8px rgba(0, 242, 254, 0.6)',
                 }}
               >

@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useRef, useState, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import { motion, type TargetAndTransition, type HTMLMotionProps } from 'motion/react';
 
 export type MotionVariant = 'energetic' | 'clean' | 'narrative' | 'gentle' | 'restrained';
 export type HoverEffect = 'lift' | 'glow' | 'border-glow' | 'none';
@@ -31,6 +32,7 @@ export interface ScrollRevealBoxProps extends Omit<React.AllHTMLAttributes<HTMLE
   style?: React.CSSProperties;
   threshold?: number;
   rootMargin?: string;
+  replay?: boolean;
 }
 
 export const ScrollRevealBox: React.FC<ScrollRevealBoxProps> = ({
@@ -40,17 +42,16 @@ export const ScrollRevealBox: React.FC<ScrollRevealBoxProps> = ({
   duration,
   hoverEffect = 'none',
   hoverAccentColor,
-  as: Component = 'div',
+  as = 'div',
   className = '',
   style = {},
   threshold = 0.1,
   rootMargin = '0px 0px -40px 0px',
+  replay = true,
   ...rest
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const [isRevealed, setIsRevealed] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -60,72 +61,43 @@ export const ScrollRevealBox: React.FC<ScrollRevealBoxProps> = ({
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      setIsRevealed(true);
-      return;
-    }
-
-    const elem = containerRef.current;
-    if (!elem) return;
-
-    // Trigger when entering viewport. Once revealed, keep revealed so upward scrolling or fast scroll doesn't flash
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsRevealed(true);
-          observer.unobserve(elem);
-        }
-      },
-      { threshold, rootMargin }
-    );
-
-    observer.observe(elem);
-    return () => observer.disconnect();
-  }, [prefersReducedMotion, threshold, rootMargin]);
-
   // Section-specific motion character configuration
   const motionConfig = useMemo(() => {
     switch (variant) {
       case 'energetic':
-        // Projects: energetic 3D perspective tilt & springy entrance
         return {
-          initialTransform: 'perspective(1000px) rotateX(5deg) translateY(32px) scale(0.97)',
-          revealedTransform: 'perspective(1000px) rotateX(0deg) translateY(0) scale(1)',
-          ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          initial: { opacity: 0, y: 32, scale: 0.97, rotateX: 5 },
+          revealed: { opacity: 1, y: 0, scale: 1, rotateX: 0 },
+          ease: [0.16, 1, 0.3, 1] as const,
           defaultDuration: 0.75,
         };
       case 'clean':
-        // Skills / Learning: crisp, organized upward translation
         return {
-          initialTransform: 'translateY(24px) scale(0.98)',
-          revealedTransform: 'translateY(0) scale(1)',
-          ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          initial: { opacity: 0, y: 24, scale: 0.98 },
+          revealed: { opacity: 1, y: 0, scale: 1 },
+          ease: [0.16, 1, 0.3, 1] as const,
           defaultDuration: 0.65,
         };
       case 'narrative':
-        // Journey & Growth: progressive narrative entrance from timeline
         return {
-          initialTransform: 'translateY(28px) translateX(-8px)',
-          revealedTransform: 'translateY(0) translateX(0)',
-          ease: 'cubic-bezier(0.19, 1, 0.22, 1)',
+          initial: { opacity: 0, y: 28, x: -8 },
+          revealed: { opacity: 1, y: 0, x: 0 },
+          ease: [0.19, 1, 0.22, 1] as const,
           defaultDuration: 0.72,
         };
       case 'gentle':
-        // Yoga & Philosophy: slow, spacious, meditative breath-like entrance
         return {
-          initialTransform: 'translateY(20px) scale(0.985)',
-          revealedTransform: 'translateY(0) scale(1)',
-          ease: 'cubic-bezier(0.25, 1, 0.5, 1)',
-          defaultDuration: 1.1,
+          initial: { opacity: 0, y: 20, scale: 0.985 },
+          revealed: { opacity: 1, y: 0, scale: 1 },
+          ease: [0.25, 1, 0.5, 1] as const,
+          defaultDuration: 0.95,
         };
       case 'restrained':
       default:
-        // Contact & Footer: elegant, restrained entrance
         return {
-          initialTransform: 'translateY(18px)',
-          revealedTransform: 'translateY(0)',
-          ease: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          initial: { opacity: 0, y: 18 },
+          revealed: { opacity: 1, y: 0 },
+          ease: [0.16, 1, 0.3, 1] as const,
           defaultDuration: 0.6,
         };
     }
@@ -133,53 +105,40 @@ export const ScrollRevealBox: React.FC<ScrollRevealBoxProps> = ({
 
   const activeDuration = duration ?? motionConfig.defaultDuration;
 
-  // Compute hover style transforms and box shadows
-  const getHoverStyles = (): React.CSSProperties => {
-    if (!isHovered || prefersReducedMotion) return {};
-
+  // Hover target transition
+  const hoverAnimation: TargetAndTransition | undefined = useMemo(() => {
+    if (hoverEffect === 'none' || prefersReducedMotion) return undefined;
     switch (hoverEffect) {
       case 'lift':
         return {
-          transform: 'translateY(-7px)',
+          y: -7,
           borderColor: hoverAccentColor || undefined,
+          transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const },
         };
       case 'border-glow':
         return {
-          transform: 'translateY(-6px)',
+          y: -6,
           borderColor: hoverAccentColor || undefined,
           boxShadow: hoverAccentColor
             ? `0 18px 40px rgba(0, 0, 0, 0.4), 0 0 24px ${hoverAccentColor}33`
             : '0 18px 40px rgba(0, 0, 0, 0.4)',
+          transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const },
         };
       case 'glow':
         return {
-          transform: 'translateY(-8px)',
+          y: -8,
           borderColor: hoverAccentColor || undefined,
           boxShadow: hoverAccentColor
             ? `0 22px 50px rgba(0, 0, 0, 0.45), 0 0 32px ${hoverAccentColor}44`
             : '0 22px 50px rgba(0, 0, 0, 0.45)',
+          transition: { duration: 0.25, ease: [0.16, 1, 0.3, 1] as const },
         };
       default:
-        return {};
+        return undefined;
     }
-  };
+  }, [hoverEffect, hoverAccentColor, prefersReducedMotion]);
 
-  const containerStyles: React.CSSProperties = prefersReducedMotion
-    ? { ...style }
-    : {
-        ...style,
-        opacity: isRevealed ? 1 : 0,
-        transform: isRevealed
-          ? (isHovered && hoverEffect !== 'none' ? getHoverStyles().transform : motionConfig.revealedTransform)
-          : motionConfig.initialTransform,
-        transition: isRevealed
-          ? (isHovered && hoverEffect !== 'none'
-              ? 'transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease, box-shadow 0.28s ease'
-              : `opacity ${activeDuration}s ${motionConfig.ease} ${delay}s, transform ${activeDuration}s ${motionConfig.ease} ${delay}s`)
-          : 'none',
-        willChange: 'transform, opacity',
-        ...getHoverStyles(),
-      };
+  const MotionComponent = as === 'a' ? motion.a : motion.div;
 
   return (
     <RevealContext.Provider
@@ -190,25 +149,38 @@ export const ScrollRevealBox: React.FC<ScrollRevealBoxProps> = ({
         prefersReducedMotion,
       }}
     >
-      <Component
-        ref={containerRef}
+      <MotionComponent
         className={`scroll-reveal-box ${isRevealed ? 'is-revealed' : ''} ${className}`}
-        style={containerStyles}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        {...rest}
+        style={{
+          transformStyle: 'preserve-3d',
+          ...style,
+        }}
+        initial={prefersReducedMotion ? false : motionConfig.initial}
+        whileInView={motionConfig.revealed}
+        viewport={{ once: !replay, amount: threshold, margin: rootMargin }}
+        transition={{
+          duration: activeDuration,
+          delay,
+          ease: motionConfig.ease,
+        }}
+        whileHover={hoverAnimation}
+        onViewportEnter={() => setIsRevealed(true)}
+        onViewportLeave={() => {
+          if (replay) setIsRevealed(false);
+        }}
+        {...(rest as any)}
       >
         {children}
-      </Component>
+      </MotionComponent>
     </RevealContext.Provider>
   );
 };
 
-export interface CardItemProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardItemProps extends Omit<HTMLMotionProps<'div'>, 'direction'> {
   children: React.ReactNode;
-  step?: number; // 1, 2, 3, 4, 5... internal reveal sequence
+  step?: number;
   direction?: 'up' | 'down' | 'left' | 'right' | 'pop' | 'fade';
-  delayOffset?: number; // extra fine tuning
+  delayOffset?: number;
   className?: string;
   style?: React.CSSProperties;
   as?: React.ElementType;
@@ -221,56 +193,45 @@ export const CardItem: React.FC<CardItemProps> = ({
   delayOffset = 0,
   className = '',
   style = {},
-  as: Component = 'div',
+  as: _as,
   ...rest
 }) => {
   const { isRevealed, baseDelay, variant, prefersReducedMotion } = useReveal();
 
-  if (prefersReducedMotion) {
-    return (
-      <Component className={className} style={{ ...style, opacity: 1 }} {...rest}>
-        {children}
-      </Component>
-    );
-  }
-
-  // Calculate internal stagger delay
+  // Internal stagger delay
   const stepInterval = variant === 'gentle' ? 0.12 : 0.08;
-  const totalDelay = Math.max(0, baseDelay + 0.1 + (step - 1) * stepInterval + delayOffset);
-  const duration = variant === 'gentle' ? 0.9 : 0.65;
-  const ease = variant === 'gentle' ? 'cubic-bezier(0.25, 1, 0.5, 1)' : 'cubic-bezier(0.16, 1, 0.3, 1)';
+  const totalDelay = Math.max(0, baseDelay + 0.08 + (step - 1) * stepInterval + delayOffset);
+  const duration = variant === 'gentle' ? 0.85 : 0.6;
+  const ease = variant === 'gentle' ? ([0.25, 1, 0.5, 1] as const) : ([0.16, 1, 0.3, 1] as const);
 
-  const getInitialTransform = () => {
+  const getInitial = () => {
     switch (direction) {
       case 'down':
-        return 'translateY(-14px)';
+        return { opacity: 0, y: -14 };
       case 'left':
-        return 'translateX(16px)';
+        return { opacity: 0, x: 16 };
       case 'right':
-        return 'translateX(-16px)';
+        return { opacity: 0, x: -16 };
       case 'pop':
-        return 'scale(0.9) translateY(8px)';
+        return { opacity: 0, scale: 0.92, y: 8 };
       case 'fade':
-        return 'none';
+        return { opacity: 0 };
       case 'up':
       default:
-        return 'translateY(14px)';
+        return { opacity: 0, y: 14 };
     }
   };
 
-  const itemStyles: React.CSSProperties = {
-    ...style,
-    opacity: isRevealed ? 1 : 0,
-    transform: isRevealed ? 'none' : getInitialTransform(),
-    transition: isRevealed
-      ? `opacity ${duration}s ${ease} ${totalDelay}s, transform ${duration}s ${ease} ${totalDelay}s`
-      : 'none',
-    willChange: 'transform, opacity',
-  };
-
   return (
-    <Component className={`card-item ${isRevealed ? 'item-revealed' : ''} ${className}`} style={itemStyles} {...rest}>
+    <motion.div
+      initial={prefersReducedMotion ? false : getInitial()}
+      animate={isRevealed ? { opacity: 1, x: 0, y: 0, scale: 1 } : getInitial()}
+      transition={{ duration, ease, delay: totalDelay }}
+      className={`card-item ${isRevealed ? 'item-revealed' : ''} ${className}`}
+      style={style}
+      {...rest}
+    >
       {children}
-    </Component>
+    </motion.div>
   );
 };

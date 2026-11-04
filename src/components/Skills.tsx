@@ -101,7 +101,7 @@ export const Skills: React.FC<SkillsProps> = ({ language }) => {
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 color: 'var(--skills-accent)',
-                background: 'rgba(192, 132, 252, 0.08)',
+                background: 'rgba(96, 165, 250, 0.08)',
                 border: '1px solid var(--skills-border)',
                 borderRadius: 'var(--radius-full)',
                 marginBottom: '1rem',
@@ -220,7 +220,7 @@ export const Skills: React.FC<SkillsProps> = ({ language }) => {
         >
           {filteredSkills.map((s, idx) => (
             <ScrollRevealBox
-              key={idx}
+              key={s.name}
               variant="clean"
               delay={0.06 * (idx % 3)}
               hoverEffect="border-glow"

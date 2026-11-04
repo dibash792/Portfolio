@@ -24,18 +24,18 @@ export const translations = {
     },
     // Hero
     hero: {
-      badge: "GRADE 11 SCIENCE STUDENT & BUILDER",
+      badge: "GRADE 11–12 SCIENCE STUDENT & BUILDER",
       greeting: "Hello, I am",
       name: "Dibash Lamichhane",
       headline: "Building my future, one project at a time.",
       subheadline:
-        "Student-builder, part-time educator at Bal Uddhar Secondary School, and STEM leader at National School of Sciences (NSS), Nepal. Learning web development, Python, and AI tools while exploring the path of yoga and inner peace.",
+        "Student-builder, part-time educator at Bal Uddhar Secondary School, and STEM leader at National School of Sciences (NSS), Lainchaur. Learning web development, Python, and AI tools while exploring the path of yoga and inner peace.",
       ctaProjects: "Explore RollX & Projects",
       ctaInner: "Inner Sanctuary (Yoga)",
       ctaContact: "Get in Touch",
-      statusActive: "Active Student & Builder",
+      statusActive: "Active Student & Builder (2026 – Present)",
       stats: {
-        academic: "National School of Sciences",
+        academic: "National School of Sciences (NSS), Lainchaur",
         role: "STEM Vice Head of NSS Club",
         teaching: "Teacher @ Bal Uddhar Sec. School",
         focus: "Web Dev & Python Explorer",
@@ -45,7 +45,7 @@ export const translations = {
     about: {
       label: "ABOUT ME",
       heading: "Curiosity in code, clarity in stillness.",
-      p1: "I am a Grade 11 Science student at the National School of Sciences (NSS) in Kathmandu, Nepal. Rather than waiting for a distant graduation to start creating, I believe in learning by actively building things with my own hands.",
+      p1: "I am a Grade 11 Science student at the National School of Sciences (NSS) in Lainchaur, Kathmandu, Nepal. Rather than waiting for a distant graduation to start creating, I believe in learning by actively building things with my own hands.",
       p2: "My curiosity is centered on learning web development, experimenting with Python scripts, exploring AI tools, and understanding entrepreneurship. Alongside my studies, I serve as STEM Vice Head of NSS Club and teach part-time at Bal Uddhar Secondary School—an experience that keeps me grounded and sharpens my ability to explain concepts simply.",
       p3: "Parallel to the digital world, I practice yoga—exploring Hatha and Kriya yoga. For me, seeking inner peace is not an afterthought; it is the central anchor of my life that gives purpose and balance to everything I build.",
       cards: {
@@ -162,12 +162,12 @@ export const translations = {
         leadership: {
           name: "Leadership & Speaking",
           level: "Real-World Experience",
-          desc: "STEM Vice Head at NSS. Organizing student activities, facilitating peer discussions, and speaking in front of audiences.",
+          desc: "STEM Vice Head at NSS, Lainchaur. Organizing student activities, facilitating peer discussions, and speaking in front of audiences.",
         },
         math: {
           name: "High School Mathematics",
           level: "Grade 11 Core",
-          desc: "Calculus, trigonometry, coordinate geometry, and logical deduction as a Grade 11 Science student.",
+          desc: "Calculus, trigonometry, coordinate geometry, and logical deduction as a Grade 11–12 Science student.",
         },
       },
     },
@@ -179,15 +179,15 @@ export const translations = {
         "Authentic milestones in my journey as a student, peer leader, and secondary school teacher in Nepal.",
       items: {
         nss: {
-          role: "Grade 11 Science Student",
-          org: "National School of Sciences (NSS), Kathmandu",
-          period: "2024 — Present",
-          desc: "Currently studying physics, chemistry, mathematics, and computer science. Applying rigorous science principles to practical problem-solving.",
+          role: "Grade 11–12, Science",
+          org: "National School of Sciences (NSS), Lainchaur",
+          period: "2026 – Present",
+          desc: "Currently studying physics, chemistry, mathematics, and computer science at NSS Lainchaur (joined 2026). Applying rigorous science principles to practical problem-solving.",
           highlights: ["Physics, Chemistry & Advanced Mathematics", "Active participant in school scientific seminars", "Hands-on laboratory inquiry"],
         },
         stem: {
           role: "STEM Vice Head of NSS Club",
-          org: "NSS Club, National School of Sciences",
+          org: "NSS Club, National School of Sciences (NSS), Lainchaur",
           period: "Current Leadership Role",
           desc: "Serving as STEM Vice Head of NSS Club. Organizing peer workshops, coordinating science forums, and encouraging student curiosity.",
           highlights: ["Co-organizing school science initiatives", "Supporting junior students in STEM", "Practicing public speaking and communication"],
@@ -314,18 +314,18 @@ export const translations = {
     },
     // Hero
     hero: {
-      badge: "कक्षा ११ विज्ञान विद्यार्थी तथा निर्माणकर्ता",
+      badge: "कक्षा ११–१२ विज्ञान विद्यार्थी तथा निर्माणकर्ता",
       greeting: "नमस्ते, म हुँ",
       name: "दिबास लामिछाने",
       headline: "मेरो भविष्य निर्माण गर्दै, एक पटकमा एउटा परियोजना।",
       subheadline:
-        "नेपालका विद्यार्थी-निर्माणकर्ता, बाल उद्धार मा.वि.का आंशिक शिक्षक, र नेसनल स्कुल अफ साइन्सेज (NSS) का स्टेम उप-प्रमुख। योग र आन्तरिक शान्तिको मार्ग अन्वेषण गर्दै वेब प्रविधि, पाइथन र एआई औजारहरू सिक्दैछु।",
+        "नेपालका विद्यार्थी-निर्माणकर्ता, बाल उद्धार मा.वि.का आंशिक शिक्षक, र नेसनल स्कुल अफ साइन्सेज (NSS), लैनचौरका स्टेम उप-प्रमुख। योग र आन्तरिक शान्तिको मार्ग अन्वेषण गर्दै वेब प्रविधि, पाइथन र एआई औजारहरू सिक्दैछु।",
       ctaProjects: "RollX र परियोजनाहरू हेर्नुहोस्",
       ctaInner: "आन्तरिक संसार (योग)",
       ctaContact: "सम्पर्क गर्नुहोस्",
-      statusActive: "सक्रिय विद्यार्थी तथा निर्माणकर्ता",
+      statusActive: "सक्रिय विद्यार्थी तथा निर्माणकर्ता (२०२६ – हालसम्म)",
       stats: {
-        academic: "नेसनल स्कुल अफ साइन्सेज",
+        academic: "नेसनल स्कुल अफ साइन्सेज (NSS), लैनचौर",
         role: "NSS क्लब स्टेम उप-प्रमुख (STEM Vice Head of NSS Club)",
         teaching: "शिक्षक @ बाल उद्धार मा.वि.",
         focus: "वेब विकास र पाइथन अध्येता",
@@ -335,7 +335,7 @@ export const translations = {
     about: {
       label: "मेरो परिचय",
       heading: "कोडमा जिज्ञासा, शान्तिमा स्पष्टता।",
-      p1: "म नेसनल स्कुल अफ साइन्सेज (NSS), काठमाडौँमा कक्षा ११ को विज्ञान संकायको विद्यार्थी हुँ। केवल प्रमाणपत्रको प्रतीक्षा नगरी आफ्नै हातले व्यावहारिक रूपमा बनाएर सिक्ने कुरामा म विश्वास गर्छु।",
+      p1: "म नेसनल स्कुल अफ साइन्सेज (NSS), लैनचौर, काठमाडौँमा कक्षा ११ को विज्ञान संकायको विद्यार्थी हुँ (२०२६ – हालसम्म)। केवल प्रमाणपत्रको प्रतीक्षा नगरी आफ्नै हातले व्यावहारिक रूपमा बनाएर सिक्ने कुरामा म विश्वास गर्छु।",
       p2: "मेरो मुख्य रुचि वेब विकास, पाइथन, कृत्रिम बौद्धिकता (AI) का औजारहरू र उद्यमशीलता सिक्नुमा छ। यसका साथै म NSS क्लबको स्टेम उप-प्रमुख (STEM Vice Head of NSS Club) को रूपमा विद्यार्थी गतिविधिहरूको नेतृत्व गर्छु र बाल उद्धार माध्यमिक विद्यालयमा आंशिक समय पढाउँछु।",
       p3: "डिजिटल संसारको समानान्तर रूपमा म योग साधना गर्छु—विशेष गरी हठ योग र क्रिया योगको अभ्यास। मेरो लागि आन्तरिक शान्तिको खोजी कुनै सहायक विषय होइन, यो मेरो सम्पूर्ण जीवन र कर्मको मुख्य केन्द्र हो।",
       cards: {
@@ -452,12 +452,12 @@ export const translations = {
         leadership: {
           name: "नेतृत्व तथा वक्तृत्व",
           level: "व्यावहारिक अनुभव",
-          desc: "NSS मा स्टेम उप-प्रमुख। कार्यक्रम समन्वय, समूह सहजीकरण र मञ्चमा आफ्ना विचारहरू प्रस्तुत गर्ने अभ्यास।",
+          desc: "NSS, लैनचौरमा स्टेम उप-प्रमुख। कार्यक्रम समन्वय, समूह सहजीकरण र मञ्चमा आफ्ना विचारहरू प्रस्तुत गर्ने अभ्यास।",
         },
         math: {
           name: "माध्यमिक तहको गणित",
           level: "कक्षा ११ विज्ञान मूल",
-          desc: "कैलकुलस, त्रिकोणमिति, कोअर्डिनेट ज्यामिति र तार्किक समस्या समाधान।",
+          desc: "कैलकुलस, त्रिकोणमिति, कोअर्डिनेट ज्यामिति र तार्किक समस्या समाधान (कक्षा ११–१२ विज्ञान)।",
         },
       },
     },
@@ -469,15 +469,15 @@ export const translations = {
         "नेपालमा एक विद्यार्थी, समूह नेतृत्वकर्ता र शिक्षकको रूपमा मेरो विकासका वास्तविक कोसेढुङ्गाहरू।",
       items: {
         nss: {
-          role: "कक्षा ११ विज्ञान विद्यार्थी",
-          org: "नेसनल स्कुल अफ साइन्सेज (NSS), काठमाडौँ",
-          period: "२०२४ — हालसम्म",
-          desc: "भौतिक विज्ञान, रसायन शास्त्र, गणित र कम्प्युटर विज्ञानको गहन अध्ययन। व्यावहारिक समस्या समाधानमा विज्ञानका सिद्धान्तहरूको प्रयोग।",
+          role: "कक्षा ११–१२, विज्ञान (Grade 11–12, Science)",
+          org: "नेसनल स्कुल अफ साइन्सेज (NSS), लैनचौर",
+          period: "२०२६ — हालसम्म (2026 – Present)",
+          desc: "भौतिक विज्ञान, रसायन शास्त्र, गणित र कम्प्युटर विज्ञानको गहन अध्ययन (२०२६ मा भर्ना)। व्यावहारिक समस्या समाधानमा विज्ञानका सिद्धान्तहरूको प्रयोग।",
           highlights: ["भौतिक विज्ञान र उच्च गणित", "विद्यालयका वैज्ञानिक गोष्ठीहरूमा सहभागिता", "प्रयोगशालामा व्यावहारिक अनुसन्धान"],
         },
         stem: {
           role: "स्टेम उप-प्रमुख (STEM Vice Head of NSS Club)",
-          org: "NSS क्लब, नेसनल स्कुल अफ साइन्सेज",
+          org: "NSS क्लब, नेसनल स्कुल अफ साइन्सेज (NSS), लैनचौर",
           period: "हालको नेतृत्व भूमिका",
           desc: "NSS क्लबको स्टेम उप-प्रमुखको रूपमा कार्य। कार्यशालाहरूको आयोजना, विज्ञान मञ्चको समन्वय र विद्यार्थीहरूमा जिज्ञासा जगाउने प्रयास।",
           highlights: ["विज्ञान तथा प्रविधि गतिविधिहरूको समन्वय", "कनिष्ठ विद्यार्थीहरूलाई सहयोग", "सार्वजनिक मञ्चहरूमा विचार प्रस्तुति"],

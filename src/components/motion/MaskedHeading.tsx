@@ -41,12 +41,24 @@ export const MaskedHeading: React.FC<MaskedHeadingProps> = ({
     const elem = containerRef.current;
     if (!elem) return;
 
+    // Check if element is already within viewport on load
+    const rect = elem.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      setInView(true);
+    }
+
+    // Bi-directional scroll observer: reveals when entering, and resets silently offscreen
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setInView(true);
-          // Keep in view without resetting to avoid jarring flickering on fast scroll
-          observer.unobserve(elem);
+        } else {
+          const top = entry.boundingClientRect.top;
+          const bottom = entry.boundingClientRect.bottom;
+          const windowH = window.innerHeight;
+          if (top > windowH + 90 || bottom < -90) {
+            setInView(false);
+          }
         }
       },
       { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }

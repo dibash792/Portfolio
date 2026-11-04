@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ExternalLink, Sparkles, Info, X, CheckCircle2 } from 'lucide-react';
+import { motion } from 'motion/react';
 import { GithubIcon } from './Icons';
 import type { Language } from '../types';
 import { translations } from '../i18n/translations';
@@ -112,7 +113,7 @@ export const Projects: React.FC<ProjectsProps> = ({ language }) => {
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 color: 'var(--projects-accent)',
-                background: 'rgba(163, 230, 53, 0.08)',
+                background: 'rgba(0, 242, 254, 0.08)',
                 border: '1px solid var(--projects-border)',
                 borderRadius: 'var(--radius-full)',
                 marginBottom: '1rem',
@@ -326,7 +327,11 @@ export const Projects: React.FC<ProjectsProps> = ({ language }) => {
 
         {/* Modal for In-depth Project Details */}
         {selectedProject && (
-          <div
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
             style={{
               position: 'fixed',
               inset: 0,
@@ -341,7 +346,10 @@ export const Projects: React.FC<ProjectsProps> = ({ language }) => {
             }}
             onClick={() => setSelectedProject(null)}
           >
-            <div
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 maxWidth: '680px',
                 width: '100%',
@@ -500,8 +508,8 @@ export const Projects: React.FC<ProjectsProps> = ({ language }) => {
                   <span>{t.closeDetails}</span>
                 </button>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </div>
     </section>

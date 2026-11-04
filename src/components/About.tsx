@@ -63,7 +63,7 @@ export const About: React.FC<AboutProps> = ({ language }) => {
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 color: 'var(--about-accent)',
-                background: 'rgba(245, 158, 11, 0.08)',
+                background: 'rgba(56, 189, 248, 0.08)',
                 border: '1px solid var(--about-border)',
                 borderRadius: 'var(--radius-full)',
                 marginBottom: '1rem',
@@ -161,8 +161,8 @@ export const About: React.FC<AboutProps> = ({ language }) => {
                       height: '46px',
                       borderRadius: '12px',
                       background: c.highlight
-                        ? 'rgba(74, 222, 128, 0.1)'
-                        : 'rgba(245, 158, 11, 0.1)',
+                        ? 'rgba(74, 222, 128, 0.12)'
+                        : 'rgba(56, 189, 248, 0.12)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',

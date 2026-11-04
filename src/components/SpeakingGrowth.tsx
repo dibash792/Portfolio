@@ -57,7 +57,7 @@ export const SpeakingGrowth: React.FC<SpeakingGrowthProps> = ({ language }) => {
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 color: 'var(--about-accent)',
-                background: 'rgba(245, 158, 11, 0.08)',
+                background: 'rgba(56, 189, 248, 0.08)',
                 border: '1px solid var(--about-border)',
                 borderRadius: 'var(--radius-full)',
                 marginBottom: '1rem',
