@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, MapPin, Check, Copy, AlertCircle, Sparkles, Loader2 } from 'lucide-react';
+import { Send, MapPin, Check, Copy, AlertCircle, Sparkles, Loader2, RefreshCw } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons';
 import type { Language } from '../types';
 import { translations } from '../i18n/translations';
@@ -19,17 +19,22 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const encode = (data: Record<string, string>) => {
-    return Object.keys(data)
-      .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
-      .join('&');
-  };
+  // Web3Forms Access Key from client-safe Vite environment configuration
+  const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY || '';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Prevent duplicate submissions if already submitting
+    if (status === 'submitting') return;
+
+    const trimmedName = form.name.trim();
+    const trimmedEmail = form.email.trim();
+    const trimmedSubject = form.subject.trim();
+    const trimmedMessage = form.message.trim();
+
     // 1. Validation
-    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+    if (!trimmedName || !trimmedEmail || !trimmedMessage) {
       setErrorMessage(
         language === 'en'
           ? 'Please fill in all required fields (Name, Email, Message).'
@@ -40,7 +45,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(form.email.trim())) {
+    if (!emailRegex.test(trimmedEmail)) {
       setErrorMessage(
         language === 'en'
           ? 'Please enter a valid email address.'
@@ -50,9 +55,8 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
       return;
     }
 
-    // Bot honeypot check
+    // Bot honeypot check (silently trap spam bots)
     if (form.botField) {
-      // Silently finish if filled by spam bot
       setStatus('success');
       return;
     }
@@ -61,25 +65,40 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
     setStatus('submitting');
 
     try {
-      // 2. Real Netlify Forms Submission
-      const response = await fetch('/', {
+      // 2. Official Web3Forms Submission via JSON API
+      const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: encode({
-          'form-name': 'contact',
-          name: form.name.trim(),
-          email: form.email.trim(),
-          subject: form.subject.trim() || 'Portfolio Inquiry',
-          message: form.message.trim(),
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: accessKey,
+          name: trimmedName,
+          email: trimmedEmail,
+          subject: trimmedSubject || `Portfolio Message from ${trimmedName}`,
+          message: trimmedMessage,
+          from_name: 'Dibash Lamichhane Portfolio',
+          botcheck: form.botField,
         }),
       });
 
-      if (response.ok) {
+      const data = await response.json();
+
+      if (response.ok && data.success) {
         setStatus('success');
         setForm({ name: '', email: '', subject: '', message: '', botField: '' });
       } else {
         setStatus('error');
-        setErrorMessage(t.form.sendError);
+        if (!accessKey) {
+          setErrorMessage(
+            language === 'en'
+              ? 'Web3Forms access key is missing. Please add VITE_WEB3FORMS_ACCESS_KEY to your .env file.'
+              : 'Web3Forms access key कन्फिगर गरिएको छैन। कृपया .env मा VITE_WEB3FORMS_ACCESS_KEY राख्नुहोस्।'
+          );
+        } else {
+          setErrorMessage(data.message || t.form.sendError);
+        }
       }
     } catch {
       setStatus('error');
@@ -351,27 +370,22 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
               {t.form.title}
             </h3>
 
-            {/* Netlify Form Element */}
+            {/* Web3Forms Contact Form */}
             <form
-              name="contact"
-              method="POST"
-              data-netlify="true"
-              data-netlify-honeypot="bot-field"
               onSubmit={handleSubmit}
+              noValidate
               style={{ display: 'flex', flexDirection: 'column', gap: '1.35rem' }}
             >
-              {/* Required hidden inputs for Netlify Forms */}
-              <input type="hidden" name="form-name" value="contact" />
-              <div style={{ display: 'none' }}>
-                <label>
-                  Don’t fill this out if you're human:
-                  <input
-                    name="bot-field"
-                    value={form.botField}
-                    onChange={(e) => setForm({ ...form, botField: e.target.value })}
-                  />
-                </label>
-              </div>
+              {/* Web3Forms Anti-Spam Honeypot */}
+              <input
+                type="checkbox"
+                name="botcheck"
+                checked={!!form.botField}
+                onChange={(e) => setForm({ ...form, botField: e.target.checked ? 'bot' : '' })}
+                style={{ display: 'none' }}
+                tabIndex={-1}
+                autoComplete="off"
+              />
 
               <CardItem step={1} direction="up">
                 <div>
@@ -379,6 +393,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                     type="text"
                     name="name"
                     required
+                    disabled={status === 'submitting'}
                     placeholder={t.form.namePlaceholder}
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -391,6 +406,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                       color: 'var(--contact-text)',
                       fontFamily: 'inherit',
                       fontSize: '0.96rem',
+                      opacity: status === 'submitting' ? 0.7 : 1,
                     }}
                   />
                 </div>
@@ -402,6 +418,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                     type="email"
                     name="email"
                     required
+                    disabled={status === 'submitting'}
                     placeholder={t.form.emailPlaceholder}
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -414,6 +431,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                       color: 'var(--contact-text)',
                       fontFamily: 'inherit',
                       fontSize: '0.96rem',
+                      opacity: status === 'submitting' ? 0.7 : 1,
                     }}
                   />
                 </div>
@@ -424,6 +442,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                   <input
                     type="text"
                     name="subject"
+                    disabled={status === 'submitting'}
                     placeholder={t.form.subjectPlaceholder}
                     value={form.subject}
                     onChange={(e) => setForm({ ...form, subject: e.target.value })}
@@ -436,6 +455,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                       color: 'var(--contact-text)',
                       fontFamily: 'inherit',
                       fontSize: '0.96rem',
+                      opacity: status === 'submitting' ? 0.7 : 1,
                     }}
                   />
                 </div>
@@ -446,6 +466,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                   <textarea
                     name="message"
                     required
+                    disabled={status === 'submitting'}
                     rows={4}
                     placeholder={t.form.messagePlaceholder}
                     value={form.message}
@@ -460,6 +481,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                       fontFamily: 'inherit',
                       fontSize: '0.96rem',
                       resize: 'vertical',
+                      opacity: status === 'submitting' ? 0.7 : 1,
                     }}
                   />
                 </div>
@@ -479,7 +501,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                     border: '1px solid rgba(239, 68, 68, 0.2)',
                   }}
                 >
-                  <AlertCircle size={15} />
+                  <AlertCircle size={15} style={{ flexShrink: 0 }} />
                   <span>{errorMessage}</span>
                 </div>
               )}
@@ -513,7 +535,7 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                 </Magnetic>
               </CardItem>
 
-              {/* Real Success State */}
+              {/* Polished Success State */}
               {status === 'success' && (
                 <div
                   style={{
@@ -523,14 +545,36 @@ export const Contact: React.FC<ContactProps> = ({ language }) => {
                     background: 'rgba(34, 197, 94, 0.1)',
                     border: '1px solid rgba(34, 197, 94, 0.3)',
                     display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '0.75rem',
+                    flexDirection: 'column',
+                    gap: '0.85rem',
                   }}
                 >
-                  <Check size={20} color="#22c55e" style={{ flexShrink: 0, marginTop: '2px' }} />
-                  <p style={{ fontSize: '0.9rem', color: 'var(--contact-text)', lineHeight: 1.5 }}>
-                    {t.form.sentSuccess}
-                  </p>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                    <Check size={20} color="#22c55e" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <p style={{ fontSize: '0.9rem', color: 'var(--contact-text)', lineHeight: 1.5 }}>
+                      {t.form.sentSuccess}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStatus('idle');
+                      setErrorMessage('');
+                    }}
+                    className="btn-secondary"
+                    style={{
+                      alignSelf: 'flex-start',
+                      fontSize: '0.82rem',
+                      padding: '0.4rem 0.85rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.45rem',
+                    }}
+                  >
+                    <RefreshCw size={13} />
+                    <span>{language === 'en' ? 'Send another message' : 'अर्को सन्देश पठाउनुहोस्'}</span>
+                  </button>
                 </div>
               )}
 
